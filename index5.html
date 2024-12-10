@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblioteca com Busca</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+        }
+        h1 {
+            text-align: center;
+        }
+        .busca-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        input {
+            padding: 10px;
+            width: 70%;
+            max-width: 400px;
+            font-size: 16px;
+        }
+        button {
+            padding: 10px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #f44336;
+            color: white;
+            border: none;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #d32f2f;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            /* display: none; */
+        }
+        th, td {
+            border: 1px solid #ddd;
+            padding: 10px;
+            text-align: left;
+        }
+        th {
+            background-color: #f4f4f4;
+        }
+        tr:nth-child(even) {
+            background-color: #f9f9f9;
+        }
+        tr:hover {
+            background-color: #e0f7fa;
+        }
+    </style>
+</head>
+<body>
+    <h1>Biblioteca</h1>
+    <div class="busca-container">
+        <input type="text" id="busca" placeholder="Digite para buscar...">
+        <button id="limpar">Limpar</button>
+    </div>
+    <table id="tabela">
+        <thead>
+            <tr>
+                <th>Numeração</th>
+                <th>Título</th>
+                <th>Autor</th>
+                <th>CDU</th>
+                <th>Assunto</th>
+            </tr>
+        </thead>
+        <tbody id="tabela-corpo"></tbody>
+    </table>
+
+    <script>
+        let dadosCarregados = [];
+
+        // Função para carregar os dados do JSON
+        async function carregarDados() {
+            try {
+                const resposta = await fetch('dados.json'); // Certifique-se de que o arquivo JSON está no mesmo diretório
+                dadosCarregados = await resposta.json(); // Carrega os dados na variável global
+            } catch (erro) {
+                console.error("Erro ao carregar o JSON:", erro);
+            }
+        }
+
+        // Função para exibir os resultados com base no filtro
+        function filtrarDados(filtro) {
+            const tabela = document.getElementById('tabela');
+            const tabelaCorpo = document.getElementById('tabela-corpo');
+
+            tabelaCorpo.innerHTML = ''; // Limpa a tabela antes de adicionar os resultados
+
+            // Filtra os resultados com base no texto digitado
+            const resultados = dadosCarregados.filter(item =>
+                Object.values(item).some(valor =>
+                    valor.toString().toLowerCase().includes(filtro)
+                )
+            );
+
+            if (resultados.length > 0) {
+                tabela.style.display = ''; // Mostra a tabela se houver resultados
+                resultados.forEach(item => {
+                    const tr = document.createElement('tr');
+                    Object.values(item).forEach(valor => {
+                        const td = document.createElement('td');
+                        td.textContent = valor;
+                        tr.appendChild(td);
+                    });
+                    tabelaCorpo.appendChild(tr);
+                });
+            } else {
+                tabela.style.display = 'none'; // Esconde a tabela se não houver resultados
+            }
+        }
+
+        // Função para limpar a busca
+        function limparBusca() {
+            const busca = document.getElementById('busca');
+            busca.value = ''; // Limpar o campo de busca
+            document.getElementById('tabela').style.display = 'none'; // Esconde a tabela
+        }
+
+        // Configura o evento de busca
+        document.getElementById('busca').addEventListener('input', function () {
+            const filtro = this.value.toLowerCase().trim();
+            filtrarDados(filtro);
+        });
+
+        // Configura o botão limpar
+        document.getElementById('limpar').addEventListener('click', limparBusca);
+
+        // Carregar os dados ao iniciar a página
+        carregarDados();
+    </script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Biblioteca com Excel</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        body { font-family: Arial, sans-serif; margin: 20px; }
+        input { margin-bottom: 10px; }
+        table { width: 100%; border-collapse: collapse; }
+        th, td { border: 1px solid #ddd; padding: 10px; }
+        th { background-color: #f4f4f4; }
+    </style>
+</head>
+<body>
+    <h1>Biblioteca</h1>
+    <input type="file" id="arquivo-excel" accept=".xlsx, .xls">
+    <input type="text" id="busca" placeholder="Digite para buscar...">
+    <table>
+        <thead>
+            <tr>
+                <th>Numeração</th>
+                <th>Título</th>
+                <th>Autor</th>
+                <th>CDU</th>
+                <th>Assunto</th>
+            </tr>
+        </thead>
+        <tbody id="tabela-corpo"></tbody>
+    </table>
+
+    <script>
+        const tabelaCorpo = document.getElementById('tabela-corpo');
+
+        document.getElementById('arquivo-excel').addEventListener('change', async (event) => {
+            const arquivo = event.target.files[0];
+            const data = await arquivo.arrayBuffer();
+            const workbook = XLSX.read(data, { type: 'array' });
+            const sheet = workbook.Sheets[workbook.SheetNames[0]];
+            const json = XLSX.utils.sheet_to_json(sheet, { header: 1 });
+
+            tabelaCorpo.innerHTML = ''; // Limpar tabela
+
+            json.slice(1).forEach(linha => { // Ignorar cabeçalho
+                const tr = document.createElement('tr');
+                linha.forEach(celula => {
+                    const td = document.createElement('td');
+                    td.textContent = celula;
+                    tr.appendChild(td);
+                });
+                tabelaCorpo.appendChild(tr);
+            });
+        });
+
+        // Filtro da busca
+        document.getElementById('busca').addEventListener('input', function () {
+            const filtro = this.value.toLowerCase();
+            const linhas = document.querySelectorAll('#tabela-corpo tr');
+            linhas.forEach(linha => {
+                const textoLinha = linha.textContent.toLowerCase();
+                linha.style.display = textoLinha.includes(filtro) ? '' : 'none';
+            });
+        });
+    </script>
+</body>
+</html>

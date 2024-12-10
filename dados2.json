@@ -1,0 +1,16 @@
+[
+    {
+        "Numeração": 1,
+        "Título": "O Senhor dos Anéis",
+        "Autor": "J.R.R. Tolkien",
+        "CDU": "820-31",
+        "Assunto": "Fantasia"
+    },
+    {
+        "Numeração": 2,
+        "Título": "Dom Casmurro",
+        "Autor": "Machado de Assis",
+        "CDU": "869-32",
+        "Assunto": "Romance"
+    }
+]
